@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="/public/user.js"></script>
+<script src="/public/util.js"></script>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kalender</title>
+</head>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Verdana, sans-serif;
+    }
+
+    .month {
+        padding: 70px 25px;
+        width: 100%;
+        background: #1abc9c;
+        text-align: center;
+    }
+
+    .month ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+
+    .month ul li {
+        color: white;
+        font-size: 20px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+    }
+
+    .month .prev {
+        float: left;
+        padding-top: 10px;
+    }
+
+    .month .next {
+        float: right;
+        padding-top: 10px;
+    }
+
+    .weekdays {
+        background-color: #ddd;
+    }
+
+    .weekdays {
+        width: 100%;
+        margin: 0;
+        padding: 10px 0;
+        background-color: #ddd;
+    }
+
+
+    .xlsx {
+        width: 100%;
+        margin: 0;
+        padding: 10px 0;
+        background-color: #ddd;
+    }
+
+    .xlsx tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<body>
+    <html>
+
+    <!DOCTYPE html>
+    <html>
+
+    <head>
+
+        <style>
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgb(0, 0, 0);
+                background-color: rgba(0, 0, 0, 0.4);
+                -webkit-animation-name: fadeIn;
+                -webkit-animation-duration: 0.4s;
+                animation-name: fadeIn;
+                animation-duration: 0.4s
+            }
+
+            .modal-content {
+                position: fixed;
+                bottom: 0;
+                background-color: #fefefe;
+                width: 100%;
+                -webkit-animation-name: slideIn;
+                -webkit-animation-duration: 0.4s;
+                animation-name: slideIn;
+                animation-duration: 0.4s
+            }
+
+            .close {
+                color: white;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+            }
+
+            .close:hover,
+            .close:focus {
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            .modal-header {
+                padding: 2px 16px;
+                background-color: #1abc9c;
+                color: white;
+            }
+
+            .modal-body {
+                padding: 2px 16px;
+            }
+
+            .modal-footer {
+                padding: 2px 16px;
+                background-color: #1abc9c;
+                color: white;
+            }
+
+            @-webkit-keyframes slideIn {
+                from {
+                    bottom: -300px;
+                    opacity: 0
+                }
+
+                to {
+                    bottom: 0;
+                    opacity: 1
+                }
+            }
+
+            @keyframes slideIn {
+                from {
+                    bottom: -300px;
+                    opacity: 0
+                }
+
+                to {
+                    bottom: 0;
+                    opacity: 1
+                }
+            }
+
+            @-webkit-keyframes fadeIn {
+                from {
+                    opacity: 0
+                }
+
+                to {
+                    opacity: 1
+                }
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0
+                }
+
+                to {
+                    opacity: 1
+                }
+            }
+
+            /*css for the columns*/
+            .column {
+                float: left;
+                width: 50%;
+                padding: 10px;
+            }
+
+
+            .row:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            @media screen and (max-width: 600px) {
+                .column {
+                    width: 100%;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <button id="modal-trigger">Open Modal</button>
+
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <h2 id="modal-header-text">You need to be logged in to performe that action:</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="column">
+                            <p>
+                            <pre>
+<h2>Login:</h2>
+<label>Username:</label> &#09; <input type="text" id="login_username" placeholder="Username"><br>
+<label>Password:</label> &#09; <input type="password" id="login_password" placeholder="Password"><br>
+<input type="submit" value="Login" onclick="login()">
+<br>
+<h2>Register:</h2>
+<label>Username:</label> &#09; <input type="username" id="register_username" placeholder="Username"><br>
+<label>Password:</label> &#09; <input type="password" id="register_password" placeholder="Passowrd"><br>
+<label>E-mail:</label> &#09; <input type="text" id="register_email" placeholder="Email"><br>
+<label>Full Name:</label>&#09; <input type="text" id="register_name" placeholder="First and Last Name"><br>
+<label>Password:</label> &#09; <input type="password" id="register_password2" placeholder="Confirm Password"><br>
+<input type="submit" value="Register" onclick="register()">
+<br>
+<h2>Logout</h2>
+<button onclick="logout()">Logout</button>
+
+                            </pre>
+                            </p>
+                        </div>
+                        <div class="column">
+                            <pre>
+                            <h2> Your appointments: </h2>
+                                <ul id="appointment-list">
+                                   
+                                </ul>
+                            </pre>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <h3><a id="userlog-info">You are currently not loged in.</a></h3>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            var modal = document.getElementById("myModal");
+            var btn = document.getElementById("modal-trigger");
+            var span = document.getElementsByClassName("close")[0];
+
+            btn.style.display = "none"
+
+            btn.onclick = function () {
+                modal.style.display = "block";
+                update_modal()
+            }
+
+            span.onclick = function () {
+                modal.style.display = "none";
+            }
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+
+        </script>
+
+    </body>
+
+    </html>
+
+
+    <div class="month">
+        <ul>
+            <li class="prev"><input type="button" onclick="time_handler(-1)" value="&#10094;"></li>
+            <li class="next"><input type="button" onclick="time_handler(1)" value="&#10095;"></li>
+            <li> <a id="month"> </a> <br> <span style="font-size:18px"> <a id="year"></a> <br> <a id="btn"> <button
+                            onclick="open_modal()"> Login Options </button> </a> </span></li>
+        </ul>
+    </div>
+
+
+
+    <table class="xlsx" id="table"></table>
+
+</body>
+
+<script>
+    var user = { username: undefined }
+
+    const print = console.log
+    const error_sayer = console.log
+    const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+    const date = new Date()
+
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+    const year_ = date.getFullYear()
+    const month_ = date.getMonth()
+
+    var year = year_
+    var month = month_
+
+    function conv_min_to_g(m) {
+        return { h: Math.floor(m / 60), m: m % 60 }
+    }
+
+    function get_thursdays() {
+        let arr = []
+        for (let i = 1; i <= 31; i++) { if (new Date(year, month, i).getDay() == 4) { arr.push(i) } }
+        return arr
+    }
+
+    function get_dump() {
+        return request("/api/get_dates_censored", { year: year, month: month })
+    }
+
+    function pray() {
+        var string = ""
+        var mins = 0
+        let th = get_thursdays()
+        let dm = get_dump()
+
+        string = `
+        <tr>
+            <th>Time</th>
+            <th>DO ${th[0]}</th>
+            <th>DO ${th[1]}</th>
+            <th>DO ${th[2]}</th>
+            <th>DO ${th[3]}</th>
+        </tr>
+        <tr><th>&nbsp</th><th>&nbsp</th><th>&nbsp</th><th>&nbsp</th><th>&nbsp</th></tr>
+        `
+
+
+        for (let i = 1; i <= 30; i++) {
+            mins++
+            var sr = "<tr>"
+            for (let I = 0; I <= 4; I++) {
+
+                t1 = conv_min_to_g((mins - 1) * 5 + 870)
+                if (t1.m.toString().length == 1) { t1.m = "0" + t1.m.toString() }
+                t1 = `${t1.h}:${t1.m}`
+
+                t2 = conv_min_to_g(mins * 5 + 870)
+                if (t2.m.toString().length == 1) { t2.m = "0" + t2.m.toString() }
+                t2 = `${t2.h}:${t2.m}`
+
+                if (I > 0) {
+
+                    if (dm.data[th[I - 1].toString()] && dm.data[th[I - 1].toString()].includes(t1 + "-" + t2)) {
+                        sr += `<th></th>`
+                    } else {
+                        sr += `<th><a id="${i}-${I}"> <button onclick="appointment_add(${th[I - 1]}, '${t1}-${t2}'); pray(); pray()"> ${t1} - ${t2} </button> </a></th>`
+                    }
+                }
+                else {
+                    sr += `<th>${t1 + "-" + t2}</th>`
+
+                }
+            }
+            sr += "</tr>"
+            string += sr
+        }
+        document.getElementById("table").innerHTML = string
+    }
+
+    pray()
+
+
+
+    function time_handler(n) {
+        if (n == 1) {
+            if (month + 1 >= 12) {
+                month = 0
+                year++
+            } else {
+                month++
+            }
+
+        } else if (n == -1) {
+            if (month - 1 < 0) {
+                month = 11
+                year--
+            } else {
+                month--
+            }
+
+        } else {
+            alert("Time Hanler broke (i think), press f5 to reload page.")
+        }
+
+        update()
+    }
+
+    function update() {
+        // update month
+        document.getElementById("month").text = months[month]
+
+        // update year
+        document.getElementById("year").text = year
+
+        // update thursdays
+        get_thursdays()
+
+        // update fucking exel spredsheet
+        pray()
+    }
+
+    function update_username(un) {
+        document.getElementById("userlog-info").text = un
+    }
+
+    function update_modal() {
+        profile_raw = request("/api/user/me", {})
+        profile = profile_raw.data
+        userinfo_swicher(profile.username)
+
+        if (profile.appointments != undefined) {
+            string = "<h3>"
+            profile.appointments.forEach((e) => {
+                E = e.split("+", 2)
+                b = E[0].split("-")
+                b.push(E[1])
+                string += `<li> ${b[2]} - ${months[b[1]]} - ${b[0]} - ${b[3]} <button onclick="appointment_cancel(${b[0]}, ${b[1]}, ${b[2]}, '${b[3]}'); update_modal()"> Cancel </button> </li>`
+            })
+            string += "</h3>"
+
+        }
+        else {
+            string = ""
+        }
+
+        document.getElementById("appointment-list").innerHTML = string
+    }
+
+    function open_modal() {
+        modal = document.getElementById("myModal");
+        modal.style.display = "block";
+        update_modal()
+    }
+
+    function close_modal() {
+        modal = document.getElementById("myModal");
+        modal.style.display = "none";
+    }
+
+
+
+    function appointment_add(day, time) {
+        r = request("/api/appointment/add", { day: day, month: month, year: year, time: time })
+
+        if (!r.error==null) {
+            open_modal()
+        }
+
+        return r
+    }
+
+    function appointment_cancel(year, month, day, time) {
+        return request("/api/appointment/del", { day: day, month: month, year: year, time: time })
+    }
+
+
+    update()
+    print("AIGHT")
+
+    const update_loop = async () => {
+        while (1) {
+            await sleep(5000);
+            update()
+        }
+    };
+    update_loop()
+</script>
+
+
+</html>
